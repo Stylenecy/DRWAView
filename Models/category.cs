@@ -1,7 +1,13 @@
-namespace SimpleRESTApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-public class Category
+namespace Simple_API.models
 {
-    public int CategoryId { get; set; }
-    public string CategoryName { get; set; } = null!;
+    public class Category
+    {
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = null!;
+    }
 }

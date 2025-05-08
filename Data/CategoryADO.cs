@@ -1,181 +1,151 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using SimpleRESTApi.Models;
+using Simple_API.models;
 
-namespace SimpleRESTApi.Data
+namespace Simple_API.data
 {
-    public class CategoryADO : Icategory
+    public class CategoryADO : ICategory
     {
         private readonly IConfiguration _configuration;
-        private string connStr = string.Empty;
-
+        private string connstr = string.Empty;
         public CategoryADO(IConfiguration configuration)
         {
             _configuration = configuration;
-            connStr = _configuration.GetConnectionString("DefaultConnection");
-        }
+            connstr = _configuration.GetConnectionString("DefaultConnection");
 
+        }
         public Category AddCategory(Category category)
         {
-            using(SqlConnection conn = new SqlConnection(connStr))
+            using(SqlConnection conn = new SqlConnection(connstr))
             {
-                string strSql = @"INSERT INTO Categories (CategoryName)
-                                VALUES (@CategoryName); 
-                                select SCOPE_IDENTITY()";
-                                
-                SqlCommand cmd = new SqlCommand(strSql, conn);
-
+                string strsql = @"INSERT INTO categories (CategoryName) 
+                                  VALUES (@CategoryName);
+                                  SELECT SCOPE_IDENTITY()";
+                SqlCommand cmd = new SqlCommand(strsql, conn);
                 try
                 {
+                    
                     cmd.Parameters.AddWithValue("@CategoryName", category.CategoryName);
                     conn.Open();
                     int CategoryId = Convert.ToInt32(cmd.ExecuteScalar());
-                    category.CategoryId=CategoryId;
-                    // int rowAffected = cmd.ExecuteNonQuery();
-                    // if(rowAffected==0)
-                    // {
-                    //     throw new Exception("INSERT failed");
-                    // }
+                    category.CategoryId = CategoryId;
+                    //throw new Exception("No records found");
+                    //category.CategoryId = id;
                     return category;
                 }
-                catch(Exception ex)
+                catch (Exception ex) 
                 {
-                    throw new Exception(ex.Message);
-
+                    throw new Exception("Error  category: " + ex.Message);
                 }
                 finally
                 {
-                    cmd.Dispose();
                     conn.Close();
                 }
-                
             }
         }
 
-        public void DeleteCategory(int CategoryId)
+        public void DeleteCategory(int id)
         {
-            using(SqlConnection conn = new SqlConnection(connStr))
+            using (SqlConnection conn = new SqlConnection(connstr))
             {
-                string strsql = @"DELETE FROM Categories WHERE CategoryId = @CategoryId";
-                SqlCommand cmd = new SqlCommand(strsql,conn);
-                try
+                string strsql = @"DELETE FROM Categories WHERE CategoryID = @CategoryID";
+                SqlCommand cmd = new SqlCommand(strsql, conn);
+                cmd.Parameters.AddWithValue("@CategoryID", id);
+                conn.Open();
+                int rowsAffected = cmd.ExecuteNonQuery();
+                if (rowsAffected == 0)
                 {
-                    cmd.Parameters.AddWithValue("@CategoryId", CategoryId);
-                    conn.Open();
-                    int result = cmd.ExecuteNonQuery();
-                    if(result==0)
-                    {
-                        throw new Exception("category not found");
-                    }
-                    // int rowAffected = cmd.ExecuteNonQuery();
-                    // if(rowAffected==0)
-                    // {
-                    //     throw new Exception("INSERT failed");
-                    // }                    
-                }
-                catch(Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    cmd.Dispose();
-                    conn.Close();
+                    throw new Exception("No records found");
                 }
             }
-
         }
 
-        public IEnumerable<Category> GetCategories()
-        {               
+        public List<Category> GetCategories()
+        {
             List<Category> categories = new List<Category>();
-            using(SqlConnection conn = new SqlConnection(connStr))
+            using (SqlConnection con = new SqlConnection(connstr))
             {
-                string strSql = @"SELECT * FROM Categories ORDER BY CategoryName";
-                SqlCommand cmd = new SqlCommand(strSql,conn);
-                conn.Open();
+                string strsql = @"SELECT * FROM Categories ORDER BY CategoryName";
+                SqlCommand cmd = new SqlCommand(strsql, con);
+                Category category = new();
+                con.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.HasRows)
+                if (dr.HasRows)
                 {
-                    while(dr.Read())
-                    {
-                        Category category= new();
-                        category.CategoryId = Convert.ToInt32(dr["CategoryId"]);
-                        category.CategoryName = dr["CategoryName"].ToString();
-                        categories.Add(category);
+                    while(dr.Read()){
+                    
+                    category.CategoryId = Convert.ToInt32(dr["CategoryID"]);
+                    category.CategoryName = dr["CategoryName"].ToString();
+                    categories.Add(category);
+                    
                     }
+                    
                 }
-                dr.Close();
-                cmd.Dispose();
-                conn.Close();
+                else
+                {
+                    throw new Exception("No records found");
+                }
+                    dr.Close();     
+                    cmd.Dispose();
+                    con.Close();
+
             }
             return categories;
         }
 
-        public Category GetCategoryById(int CategoryId)
+        public Category GetCategory(int id)
         {
             Category category = new();
-            using(SqlConnection conn = new SqlConnection(connStr))
+            using(SqlConnection conn = new SqlConnection(connstr))
             {
-                string strSql = @"SELECT * FROM Categories WHERE CategoryId = @CategoryId";
-                SqlCommand cmd = new SqlCommand(strSql, conn);
-                cmd.Parameters.AddWithValue("@CategoryId", CategoryId);
+                string strsql = @"SELECT * FROM Categories WHERE CategoryID = @CategoryID";
+                SqlCommand cmd = new SqlCommand(strsql, conn);
+                cmd.Parameters.AddWithValue("@CategoryID", id);
                 conn.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
-                if(dr.HasRows)
+                if (dr.HasRows)
                 {
                     dr.Read();
-                    category.CategoryId = Convert.ToInt32(dr["CategoryId"]);
+                    category.CategoryId = Convert.ToInt32(dr["CategoryID"]);
                     category.CategoryName = dr["CategoryName"].ToString();
-                }
+                    
+                } 
                 else
                 {
-                    throw new Exception("category not found");
-
+                    throw new Exception("No records found");
                 }
-
             }
             return category;
         }
 
         public Category UpdateCategory(Category category)
         {
-            using(SqlConnection conn = new SqlConnection(connStr))
+            using (SqlConnection conn = new SqlConnection(connstr))
             {
-                string strsql = @"UPDATE Categories SET CategoryName = @CategoryName
-                                WHERE CategoryId=@CategoryId";
-                SqlCommand cmd = new SqlCommand(strsql,conn);
-                try
-                {
+                string strsql = @"UPDATE Categories SET CategoryName = @CategoryName WHERE CategoryID = @CategoryID";
+                SqlCommand cmd = new SqlCommand(strsql, conn);
+                try{
+                    cmd.Parameters.AddWithValue("@CategoryID", category.CategoryId);
                     cmd.Parameters.AddWithValue("@CategoryName", category.CategoryName);
-                    cmd.Parameters.AddWithValue("@CategoryId", category.CategoryId);
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();
-                    if(result==0)
+                    if (result == 0)
                     {
-                        throw new Exception("category not found");
+                        throw new Exception("No records found");
                     }
                     return category;
-                    // int rowAffected = cmd.ExecuteNonQuery();
-                    // if(rowAffected==0)
-                    // {
-                    //     throw new Exception("INSERT failed");
-                    // }                    
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    throw new Exception(ex.Message);
+                    throw new Exception("Error  category: " + ex.Message);
                 }
                 finally
                 {
-                    cmd.Dispose();
                     conn.Close();
                 }
-                
             }
         }
     }

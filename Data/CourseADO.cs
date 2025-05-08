@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using Simple_API.models;
 using SimpleRESTApi.Models;
 
 namespace SimpleRESTApi.Data
@@ -192,5 +193,9 @@ namespace SimpleRESTApi.Data
                 }
             }
         }
+    }
+
+    public interface ICourse
+    {
     }
 }

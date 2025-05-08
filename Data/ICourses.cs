@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SimpleRESTApi.Models;
+using Simple_API.models;
 
-namespace SimpleRESTApi.Data
+namespace Simple_API.Data
 {
-    public interface ICourse
+    public interface ICourses
     {
-        IEnumerable<ViewCourseWithCategory> GetCourses();
-        ViewCourseWithCategory GetCourseById(int courseId);
+        IEnumerable<Course> GetCourses();
+        Course GetCourse(int courseId);
         Course AddCourse(Course course);
         Course UpdateCourse(Course course);
         void DeleteCourse(int courseId);

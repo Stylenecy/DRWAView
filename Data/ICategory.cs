@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SimpleRESTApi.Models;
+using Simple_API.models;
 
-namespace SimpleRESTApi.Data
+namespace Simple_API.data
 {
-    public interface Icategory
+    public interface ICategory
     {
-        IEnumerable<Category>GetCategories();
-        Category GetCategoryById(int CategoryId);
-        Category AddCategory(Category category);
-        Category UpdateCategory(Category category);
-        void DeleteCategory(int CategoryId);
+        public List<Category> GetCategories();
+        public Category GetCategory(int id);
+        public Category AddCategory(Category category);
+        public Category UpdateCategory(Category category);
+        public void DeleteCategory(int id);
     }
 }

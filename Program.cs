@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Simple_API.data;
+using Simple_API.Data;
+using Simple_API.models;
 using SimpleRESTApi.Data;
 using SimpleRESTApi.Models;
 
@@ -8,10 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Dependency injection 
 builder.Services.AddScoped<IInstructor, InstructorADO>();
-builder.Services.AddSingleton<Icategory, CategoryADO>();
-builder.Services.AddSingleton<ICourse, CourseADO>();
+builder.Services.AddSingleton<ICategory, CategoryADO>();
+builder.Services.AddScoped<ICourses, CourseEF>();
 
 var app = builder.Build();
 
@@ -25,31 +32,31 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // Categories API
-app.MapGet("api/v1/categories", (Icategory categoryData) =>
+app.MapGet("api/v1/categories", (ICategory categoryData) =>
 {
     var categories = categoryData.GetCategories();
     return Results.Ok(categories);
 });
 
-app.MapGet("api/v1/categories/{id}", (Icategory categoryData, int id) =>
+app.MapGet("api/v1/categories/{id}", (ICategory categoryData, int id) =>
 {
-    var category = categoryData.GetCategoryById(id);
+    var category = categoryData.GetCategory(id);
     return category is not null ? Results.Ok(category) : Results.NotFound();
 });
 
-app.MapPost("api/v1/categories", (Icategory categoryData, Category category) =>
+app.MapPost("api/v1/categories", (ICategory categoryData, Category category) =>
 {
     var newCategory = categoryData.AddCategory(category);
     return Results.Created($"/api/v1/categories/{newCategory.CategoryId}", newCategory);
 });
 
-app.MapPut("api/v1/categories", (Icategory categoryData, Category category) =>
+app.MapPut("api/v1/categories", (ICategory categoryData, Category category) =>
 {
     var updatedCategory = categoryData.UpdateCategory(category);
     return Results.Ok(updatedCategory);
 });
 
-app.MapDelete("api/v1/categories/{id}", (Icategory categoryData, int id) =>
+app.MapDelete("api/v1/categories/{id}", (ICategory categoryData, int id) =>
 {
     categoryData.DeleteCategory(id);
     return Results.NoContent();
@@ -86,34 +93,31 @@ app.MapDelete("api/v1/instructors/{id}", (IInstructor instructorData, int id) =>
     return Results.NoContent();
 });
 
-app.MapGet("api/v1/courses", (ICourse courseData) =>
+app.MapGet("api/v1/courses", (ICourses course) =>
 {
-    var courses = courseData.GetCourses();
-    return courses;
+    return course.GetCourses();
 });
 
-app.MapGet("api/v1/courses/{id}", (ICourse courseData, int id) =>
+app.MapGet("api/v1/courses/{id}", (ICourses course, int id) =>
 {
-    var course = courseData.GetCourseById(id);
-    return course is not null ? Results.Ok(course) : Results.NotFound();
+    return course.GetCourse(id);
 });
 
-app.MapPost("api/v1/courses", (ICourse courseData, Course course) =>
+app.MapPost("api/v1/courses", (ICourses courseData, Course course) =>
 {
-    var newCourse = courseData.AddCourse(course);
-    return newCourse;
+    return courseData.AddCourse(course);
 });
 
-app.MapPut("api/v1/courses", (ICourse courseData, Course course) =>
+
+app.MapPut("api/v1/courses", (ICourses courseData, Course course) =>
 {
-    var updatedCourse = courseData.UpdateCourse(course);
-    return updatedCourse;
+    return courseData.UpdateCourse(course);
 });
 
-app.MapDelete("api/v1/courses/{id}", (ICourse courseData, int id) =>
+app.MapDelete("api/v1/courses/{id}", (ICourses courseData, int id) =>
 {
     courseData.DeleteCourse(id);
-    return Results.NoContent();
+    return "Course deleted successfully";
 });
 
 app.Run();
