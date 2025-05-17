@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Simple_API.models;
+using SimpleRESTApi.Data;
+using SimpleRESTApi.Models;
 
-namespace Simple_API.data
+namespace SimpleRESTApi.Data
 {
     public interface ICategory
     {

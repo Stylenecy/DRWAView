@@ -1,90 +1,170 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Simple_API.Data;
-using Simple_API.models;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SimpleRESTApi.Data;
-
-namespace Simple_API.data
+using SimpleRESTApi.Models;
+using SimpleRESTApi.DTO;
+namespace SimpleRESTApi.Data
 {
     public class CourseEF : ICourses
     {
-        private readonly ApplicationDBContext _context ;
+        private readonly ApplicationDBContext _context;
         public CourseEF(ApplicationDBContext context)
         {
             _context = context;
         }
-        public Course AddCourse(Course course)
+        public SimpleRESTApi.Models.Course AddCourse(SimpleRESTApi.Models.Course course)
         {
             try
             {
+                if (course == null)
+                {
+                    throw new ArgumentNullException(nameof(course), "Course cannot be null");
+                }
                 _context.Courses.Add(course);
                 _context.SaveChanges();
-                return course;
+
+                var createdCourse = _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.Instructor)
+                .FirstOrDefault(c => c.CourseId == course.CourseId);
+
+                return createdCourse!;
             }
-            catch (Exception ex)
+            catch (DbUpdateException dbex)
             {
-                throw new Exception("Error adding course", ex);
+                throw new Exception("An error occurred while adding the course", dbex);
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception("An unecpected error occurred", ex);
             }
         }
 
-        public void DeleteCourse(int CourseId)
+        public void DeleteCourse(int courseId)
         {
-            var course = GetCourse(CourseId);
-            if (course != null)
+            try
             {
+                var course = _context.Courses.Find(courseId);
+                if (course == null)
+                {
+                    throw new Exception("Course not found");
+                }
                 _context.Courses.Remove(course);
                 _context.SaveChanges();
             }
-            else
+            catch (DbUpdateException dbex)
             {
-                throw new Exception("Course not found");
-            }
-        }
-
-        public Course GetCourse(int CourseId)
-        {
-            var course = _context.Courses.FirstOrDefault(c => c.CourseId == CourseId);
-            if (course != null)
-            {
-                return course;
-            }
-            try
-            {
-                throw new Exception("Course not found");
+                throw new Exception("An error occurred while deleting the course", dbex);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error in SQL: " + ex.Message);
+                throw new Exception("An unexpected error occurred", ex);
             }
         }
 
-        public IEnumerable<Course> GetCourses()
+        public ViewCourseWithCategory GetCourseById(int courseId)
         {
-            var course = _context.Courses.OrderByDescending(c => c.CourseId).ToList();
+            var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
+            if (course == null)
+            {
+                throw new Exception("Course not found");
+            }
+            return new ViewCourseWithCategory
+            {
+                CourseId = course.CourseId,
+                CourseName = course.CourseName,
+                CategoryId = course.CategoryId,
+                InstructorId = course.InstructorId
+            };
+        }
+
+        public Course GetCourseByIdCourse(int courseId)
+        {
+            var course = _context.Courses.Include(c => c.Category).Include(c => c.Instructor).FirstOrDefault(c => c.CourseId == courseId);
+            if (course == null)
+            {
+                throw new Exception("Course not found");
+            }
             return course;
+        }
+
+        public IEnumerable<ViewCourseWithCategory> GetCourses()
+        {
+            var courses = _context.Courses
+        .Include(c => c.Category)
+        .Include(c => c.Instructor)
+        .OrderByDescending(c => c.CourseId)
+        .ToList();
+
+            var viewCourses = courses.Select(c => new ViewCourseWithCategory
+            {
+                CourseId = c.CourseId,
+                CourseName = c.CourseName,
+                CourseDescription = c.CourseDescription,
+                Duration = c.Duration,
+                CategoryId = c.CategoryId,
+                CategoryName = c.Category.CategoryName,
+                InstructorId = c.InstructorId,
+            }).ToList();
+
+            return viewCourses;
         }
 
         public Course UpdateCourse(Course course)
         {
-            var existingCourse = GetCourse(course.CourseId);
-            if (existingCourse != null)
+            try
             {
+                if (course == null)
+                {
+                    throw new ArgumentNullException(nameof(course), "Course cannot be null");
+                }
+
+                var existingCourse = _context.Courses.Find(course.CourseId);
+                if (existingCourse == null)
+                {
+                    throw new Exception("Course not found");
+                }
                 existingCourse.CourseName = course.CourseName;
-                existingCourse.CourseId = course.CourseId;
+                existingCourse.CategoryId = course.CategoryId;
+                existingCourse.InstructorId = course.InstructorId;
                 existingCourse.CourseDescription = course.CourseDescription;
                 existingCourse.Duration = course.Duration;
-                existingCourse.CategoryId = course.CategoryId;
-                _context.Courses.Update(existingCourse);
                 _context.SaveChanges();
-                // Ensure the Description column exists in the database before using it
-                // existingCourse.Description = course.Description;
-                return existingCourse;
+                var updatedCourse = _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.Instructor)
+                .FirstOrDefault(c => c.CourseId == course.CourseId);
+                if (updatedCourse == null)
+                {
+                    throw new Exception("Course not found after update");
+                }
+
+                return updatedCourse;
             }
-            else 
+            catch (DbUpdateException dbex)
             {
-                throw new Exception("Course not found");
+                throw new Exception("An error occurred while updating the course", dbex);
             }
+            catch (Exception ex)
+            {
+                throw new Exception("Error updating course", ex);
+            }
+        }
+
+        public IEnumerable<Course> GetAllCourses()
+        {
+            return _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.Instructor)
+                .ToList();
+        }
+
+        public IEnumerable<Course> GetCoursesByCategoryId(int categoryId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

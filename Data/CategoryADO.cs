@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
-using Simple_API.models;
+using SimpleRESTApi.Data;
+using SimpleRESTApi.Models;
 
-namespace Simple_API.data
+namespace SimpleRESTApi.Data
 {
     public class CategoryADO : ICategory
     {

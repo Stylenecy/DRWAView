@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Simple_API.models;
+using SimpleRESTApi.Models;
 
-namespace Simple_API.data
+namespace SimpleRESTApi.Data
 {
     public class ApplicationDBContext : DbContext
     {
@@ -15,6 +15,8 @@ namespace Simple_API.data
         }
 
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
     }
     
 }
