@@ -6,6 +6,8 @@ D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.
 D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\SimpleRESTApi.runtimeconfig.json
 D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\SimpleRESTApi.dll
 D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\SimpleRESTApi.pdb
+D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\AutoMapper.dll
+D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\Azure.Core.dll
 D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\Azure.Identity.dll
 D:\AT Kuliah\Semester 4\Desain RESTFul Web API\VSC\SimpleRESTApi\bin\Debug\net9.0\Humanizer.dll

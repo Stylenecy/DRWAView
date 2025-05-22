@@ -19,6 +19,10 @@ builder.Services.AddScoped<IInstructor, InstructorADO>();
 builder.Services.AddSingleton<ICategory, CategoryADO>();
 builder.Services.AddScoped<ICourses, CourseEF>();
 
+//AutoMapper
+// builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

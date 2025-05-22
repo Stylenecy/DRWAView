@@ -6,7 +6,7 @@ using SimpleRESTApi.Models;
 
 namespace SimpleRESTApi.Data
 {
-    public class DataAccessLayerInstructor : interfaceInstructor
+    public class DataAccessLayerInstructor : IInstructor
     {
         private List<Instructor> _instructors = new List<Instructor>();
         public DataAccessLayerInstructor()
@@ -76,6 +76,12 @@ namespace SimpleRESTApi.Data
                     InstructorCity = "Berlin"
                 });
         }
+
+        public Instructor AddInstructor(Instructor instructor)
+        {
+            throw new NotImplementedException();
+        }
+
         public Instructor AddInstructorAsync(Instructor instructor)
         {
             _instructors.Add(instructor);
@@ -116,6 +122,11 @@ namespace SimpleRESTApi.Data
             existingInstructor.InstructorAddress = instructor.InstructorAddress;
             existingInstructor.InstructorCity = instructor.InstructorCity;
             return instructor;
+        }
+
+        IEnumerable<Instructor> IInstructor.GetInstructors()
+        {
+            return GetInstructors();
         }
     }
 }
