@@ -14,9 +14,10 @@ namespace SimpleRESTApi.Data
 
         }
 
-        public DbSet<Course> Courses { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Instructor> Instructors { get; set; }
+        public DbSet<Course> Courses { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<Instructor> Instructors { get; set; } = null!;
+        public DbSet<AspUser> AspUsers { get; set; } = null!;
     }
     
 }
